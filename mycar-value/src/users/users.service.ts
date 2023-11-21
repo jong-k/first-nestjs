@@ -14,4 +14,16 @@ export class UsersService {
     // 엔터티가 DB에 없으면 삽입, 있으면 업데이트
     return this.repo.save(user);
   }
+
+  findOne(id: number) {
+    return this.repo.findOneBy({ id });
+  }
+
+  find(email: string) {
+    return this.repo.find({ where: { email } });
+  }
+
+  update() {}
+
+  remove() {}
 }
