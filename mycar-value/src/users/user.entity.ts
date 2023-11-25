@@ -6,7 +6,6 @@ import {
   Column,
   PrimaryGeneratedColumn,
 } from "typeorm";
-import { Exclude } from "class-transformer";
 
 @Entity()
 export class User {
@@ -17,7 +16,6 @@ export class User {
   email: string;
 
   @Column()
-  @Exclude() // 비밀번호는 반환하지 않음
   password: string;
 
   @AfterInsert()
