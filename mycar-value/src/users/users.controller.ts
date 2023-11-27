@@ -8,6 +8,7 @@ import {
   Patch,
   Query,
   NotFoundException,
+  Session,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dtos/create-user.dto";
 import { UpdateUserDto } from "./dtos/update-user.dto";
@@ -23,6 +24,18 @@ export class UsersController {
     private usersService: UsersService,
     private authService: AuthService,
   ) {}
+  // 쿠키 세션 테스트를 위한 임시 req handler
+  // /colors/red 이렇게 요청보내면 Set-Cookie에 red 설정
+  @Get("/colors/:color")
+  setColor(@Param("color") color: string, @Session() session: any) {
+    session.color = color;
+  }
+  // 쿠키 세션 테스트를 위한 임시 req handler
+  // 위에서 설정한 color가 응답 body로 반환됨
+  @Get("/colors")
+  getColor(@Session() session: any) {
+    return session.color;
+  }
 
   @Post("/signup")
   createUser(@Body() body: CreateUserDto) {
