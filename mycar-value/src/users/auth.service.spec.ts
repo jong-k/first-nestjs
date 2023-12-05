@@ -61,10 +61,11 @@ describe("AuthService", () => {
     // 일단 AuthService가 UsersService를 필요로 하므로, UsersService 의존성이 AuthService에 주입됨
     // find 메서드를 어떤 더미 유저를 찾는 메서드로 고정시켜줌
     // 그리고 signup 테스트 시 먼저 찾아져야 할 유저가 fake find에서 고정된 유저로 할당됨
-    fakeUsersService.find = () =>
-      Promise.resolve([
-        { id: 1, email: "a@a.com", password: 1 } as unknown as User,
-      ]); // 에러 해결을 위해 일단 unknown 타입 할당
+    // fakeUsersService.find = () =>
+    //   Promise.resolve([
+    //     { id: 1, email: "a@a.com", password: 1 } as unknown as User,
+    //   ]); // 에러 해결을 위해 일단 unknown 타입 할당
+    await service.signup("testing@testing.com", "testtest");
     // BadRequestException 에러가 발생할 거라고 테스트
     await expect(
       // find 에서 무조건 { id: 1, email: "a", password: 1 } 가 반환되기 때문에
@@ -81,12 +82,12 @@ describe("AuthService", () => {
   });
 
   it("잘못된 비밀번호를 입력하면 에러 발생", async () => {
-    // 비밀번호 pass
-    fakeUsersService.find = () =>
-      Promise.resolve([
-        { id: 1, email: "a@a.com", password: "pass" } as unknown as User,
-      ]);
-    await expect(service.signin("a@a.com", "word")).rejects.toThrow(
+    // fakeUsersService.find = () =>
+    //   Promise.resolve([
+    //     { id: 1, email: "a@a.com", password: "pass" } as unknown as User,
+    //   ]);
+    await service.signup("tester@tester.com", "pass");
+    await expect(service.signin("tester@tester.com", "word")).rejects.toThrow(
       BadRequestException,
     );
   });
@@ -94,7 +95,6 @@ describe("AuthService", () => {
   it("올바른 비밀번호로 로그인 시 성공", async () => {
     // singup 실행한 뒤 console.log() 로 얻은 salt.hash 문자열로 fake find 재할당하여 바로 로그인해보는 극단적으로 원시적인 방법도 있음
     await service.signup("test@test.com", "mypassword");
-
     const user = await service.signin("test@test.com", "mypassword");
     expect(user).toBeDefined();
   });
