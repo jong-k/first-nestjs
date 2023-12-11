@@ -1,5 +1,7 @@
-import { Module } from "@nestjs/common";
+import { Module, ValidationPipe, MiddlewareConsumer } from "@nestjs/common";
+import { APP_PIPE } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import cookieSession from "cookie-session"; // 소문자로 이렇게 import 해야 함
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UsersModule } from "./users/users.module";
@@ -19,6 +21,23 @@ import { Report } from "./reports/report.entity";
     ReportsModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({ whitelist: true }), // global pipe
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule {
+  // global middleware 설정
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(
+        cookieSession({
+          keys: ["salttext"], // dev 환경이라 일단 이렇게 넘어감
+        }),
+      )
+      .forRoutes("*");
+  }
+}
