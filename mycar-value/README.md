@@ -1,5 +1,9 @@
 # Used Car Pricing API
 
+## 준비
+- .env.development
+- .env.test
+
 ## Task
 - [ ] 유저는 이메일로 회원가입할 수 있다
 - [ ] 유저는 중고차를 판매할 때 대략적인 견적을 받을 수 있다 (메이커, 모델, 연식, 주행거리에 따른)
