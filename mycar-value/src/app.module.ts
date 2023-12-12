@@ -1,6 +1,7 @@
 import { Module, ValidationPipe, MiddlewareConsumer } from "@nestjs/common";
 import { APP_PIPE } from "@nestjs/core";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 import cookieSession from "cookie-session"; // 소문자로 이렇게 import 해야 함
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -11,12 +12,28 @@ import { Report } from "./reports/report.entity";
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: "sqlite",
-      database: "db.sqlite",
-      entities: [User, Report],
-      synchronize: true, // development 전용
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV}`,
     }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => {
+        return {
+          type: "sqlite",
+          database: config.get<string>("DB_NAME"),
+          synchronize: true,
+          entities: [User, Report],
+        };
+      },
+    }),
+    // TypeOrmModule.forRoot({
+    //   type: "sqlite",
+    //   // database: process.env.NODE_ENV === "test" ? "test.sqlite" : "db.sqlite", // nest 권장 방법
+    //   database: "db.sqlite",
+    //   entities: [User, Report],
+    //   synchronize: true, // development 전용
+    // }),
     UsersModule,
     ReportsModule,
   ],
